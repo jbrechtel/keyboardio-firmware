@@ -16,39 +16,21 @@
 // The Kaleidoscope core
 #include "Kaleidoscope.h"
 
-// Support for keys that move the mouse
-#include "Kaleidoscope-MouseKeys.h"
-
 // Support for macros
 #include "Kaleidoscope-Macros.h"
 
 // Support for controlling the keyboard's LEDs
 #include "Kaleidoscope-LEDControl.h"
 
-// Support for "Numpad" mode, which is mostly just the Numpad specific LED mode
-#include "Kaleidoscope-NumPad.h"
-
-// Support for an "LED off mode"
-#include "LED-Off.h"
-
-// Support for the "Boot greeting" effect, which pulses the 'LED' button for 10s
-// when the keyboard is connected to a computer (or that computer is powered on)
-#include "Kaleidoscope-LEDEffect-BootGreeting.h"
-
-// Support for Keyboardio's internal keyboard testing mode
-#include "Kaleidoscope-Model01-TestMode.h"
-
 // Support for host power management (suspend & wakeup)
 #include "Kaleidoscope-HostPowerManagement.h"
-
-// Support for magic combos (key chords that trigger an action)
-#include "Kaleidoscope-MagicCombo.h"
 
 // Support for USB quirks, like changing the key state report protocol
 #include "Kaleidoscope-USB-Quirks.h"
 
 // Support for OneShot modifiers
 #include "Kaleidoscope-OneShot.h"
+#include "Kaleidoscope-Escape-OneShot.h"
 #include "Kaleidoscope-LED-ActiveModColor.h"
 
 /** This 'enum' is a list of all the macros used by the Model 01's firmware
@@ -195,14 +177,14 @@ KEYMAPS(
 #elif defined (PRIMARY_KEYMAP_CUSTOM)
   // Edit this keymap to make a custom layout
   [PRIMARY] = KEYMAP_STACKED
-  (___,               Key_1,         Key_2,         Key_3, Key_4, Key_5, Key_LEDEffectNext,
+  (___,               Key_1,         Key_2,         Key_3, Key_4, Key_5, ___,
    Key_Backtick,      Key_Q,         Key_W,         Key_E, Key_R, Key_T, Key_Tab,
    OSM(LeftControl),  Key_A,         Key_S,         Key_D, Key_F, Key_G,
    Key_Escape, Key_Z, Key_X,         Key_C,         Key_V, Key_B,        ___,
    Key_Home,   Key_Backspace, OSM(LeftGui), OSM(LeftShift),
    OSL(FUNCTION),
 
-   M(MACRO_ANY),      Key_6,        Key_7,        Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
+   M(MACRO_ANY),      Key_6,        Key_7,        Key_8,     Key_9,         Key_0,         ___,
    ___,               Key_Y,        Key_U,        Key_I,     Key_O,         Key_P,         Key_Equals,
                       Key_H,        Key_J,        Key_K,     Key_L,         Key_Semicolon, Key_Quote,
    Key_RightAlt,      Key_N,        Key_M,        Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
@@ -234,9 +216,9 @@ KEYMAPS(
 
   [FUNCTION] =  KEYMAP_STACKED
   (___,      Key_F1,           Key_F2,      Key_F3,     Key_F4,         Key_F5, Key_CapsLock,
-   Key_Tab,  ___,              Key_mouseUp, ___,        ___,         ___,    Key_mouseWarpNE,
-   Key_LeftControl, Key_mouseL,       Key_mouseDn, Key_Esc,    ___,         ___,
-   Key_End,  Key_PrintScreen,  Key_Insert,  ___,        ___,         ___,    Key_mouseWarpSE,
+   Key_Tab,  ___,              ___, ___,        ___,         ___,    ___,
+   Key_LeftControl, ___,       ___, Key_Esc,    ___,         ___,
+   Key_End,  Key_PrintScreen,  Key_Insert,  ___,        ___,         ___,    ___,
    ___, Key_Delete, ___, ___,
    ___,
 
@@ -348,65 +330,13 @@ enum {
   COMBO_TOGGLE_NKRO_MODE
 };
 
-/** A tiny wrapper, to be used by MagicCombo.
- * This simply toggles the keyboard protocol via USBQuirks, and wraps it within
- * a function with an unused argument, to match what MagicCombo expects.
- */
-static void toggleKeyboardProtocol(uint8_t combo_index) {
-  USBQuirks.toggleKeyboardProtocol();
-}
-
-/** Magic combo list, a list of key combo and action pairs the firmware should
- * recognise.
- */
-USE_MAGIC_COMBOS({.action = toggleKeyboardProtocol,
-                  // Left Fn + Esc + Shift
-                  .keys = { R3C6, R2C6, R3C7 }
-                 });
-
-// First, tell Kaleidoscope which plugins you want to use.
-// The order can be important. For example, LED effects are
-// added in the order they're listed here.
 KALEIDOSCOPE_INIT_PLUGINS(
-  // The boot greeting effect pulses the LED button for 10 seconds after the keyboard is first connected
-  BootGreetingEffect,
-
-  // The hardware test mode, which can be invoked by tapping Prog, LED and the left Fn button at the same time.
-  TestMode,
-
-  // LEDControl provides support for other LED modes
-  LEDControl,
-
-  // We start with the LED effect that turns off all the LEDs.
-  LEDOff,
-
-  // The numpad plugin is responsible for lighting up the 'numpad' mode
-  // with a custom LED effect
-  NumPad,
-
-  // The macros plugin adds support for macros
   Macros,
-
-  // The MouseKeys plugin lets you add keys to your keymap which move the mouse.
-  MouseKeys,
-
-  // The HostPowerManagement plugin allows us to turn LEDs off when then host
-  // goes to sleep, and resume them when it wakes up.
   HostPowerManagement,
-
-  // The MagicCombo plugin lets you use key combinations to trigger custom
-  // actions - a bit like Macros, but triggered by pressing multiple keys at the
-  // same time.
-  MagicCombo,
-
-  // The USBQuirks plugin lets you do some things with USB that we aren't
-  // comfortable - or able - to do automatically, but can be useful
-  // nevertheless. Such as toggling the key report protocol between Boot (used
-  // by BIOSes) and Report (NKRO).
   USBQuirks,
-
   OneShot,
-
+  EscapeOneShot,
+  LEDControl,
   ActiveModColorEffect
 );
 
@@ -418,18 +348,11 @@ void setup() {
   // First, call Kaleidoscope's internal setup function
   Kaleidoscope.setup();
 
-  // While we hope to improve this in the future, the NumPad plugin
-  // needs to be explicitly told which keymap layer is your numpad layer
-  NumPad.numPadLayer = NUMPAD;
-
-  // We want to make sure that the firmware starts with LED effects off
-  // This avoids over-taxing devices that don't have a lot of power to share
-  // with USB devices
-  LEDOff.activate();
-
-  OneShot.double_tap_sticky = false;
-  OneShot.double_tap_sticky_layers = false;
+  OneShot.disableStickabilityForLayers();
+  OneShot.disableStickabilityForModifiers();
   ActiveModColorEffect.highlight_color = CRGB(0x00, 0xff, 0xff);
+  //ActiveModColorEffect.sticky_color = CRGB(0xff, 0x00, 0x00);
+  LEDOff.activate();
 }
 
 /** loop is the second of the standard Arduino sketch functions.
