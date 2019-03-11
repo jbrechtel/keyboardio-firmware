@@ -8,6 +8,7 @@
 
 
 #include "Kaleidoscope.h"
+#include "Kaleidoscope-Macros.h"
 #include "Kaleidoscope-LEDControl.h"
 #include "Kaleidoscope-HostPowerManagement.h"
 #include "Kaleidoscope-USB-Quirks.h"
@@ -15,14 +16,12 @@
 #include "Kaleidoscope-Escape-OneShot.h"
 #include "Kaleidoscope-LED-ActiveModColor.h"
 
-enum { PRIMARY, NUMPAD, FUNCTION }; // layers
+enum { PRIMARY, MACROS, FUNCTION };
 #define PRIMARY_KEYMAP_CUSTOM
 KEYMAPS(
 
-#if defined (PRIMARY_KEYMAP_CUSTOM)
-  // Edit this keymap to make a custom layout
   [PRIMARY] = KEYMAP_STACKED
-  (___,               Key_1,         Key_2,         Key_3, Key_4, Key_5, ___,
+  (___,               Key_1,         Key_2,         Key_3, Key_4, Key_5, OSL(MACROS),
    Key_Backtick,      Key_Q,         Key_W,         Key_E, Key_R, Key_T, Key_Tab,
    OSM(LeftControl),  Key_A,         Key_S,         Key_D, Key_F, Key_G,
    Key_Escape, Key_Z, Key_X,         Key_C,         Key_V, Key_B,        ___,
@@ -36,25 +35,19 @@ KEYMAPS(
    Key_Enter,         Key_End, Key_Spacebar, Key_RightControl,
    OSL(FUNCTION)),
 
-#else
-
-#error "No default keymap defined. You should make sure that you have a line like '#define PRIMARY_KEYMAP_QWERTY' in your sketch"
-
-#endif
-
-  [NUMPAD] =  KEYMAP_STACKED
-  (___, ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___, ___, ___, ___,
-   ___, ___, ___, ___,
+  [MACROS] = KEYMAP_STACKED
+  (___, M(0), M(1), M(2), M(3), M(4), ___,
+   ___, ___,  ___,  ___,  ___,  ___,  M(8),
+   ___, ___,  ___,  ___,  ___,  ___,
+   ___, ___,  ___,  ___,  ___,  ___,  ___,
+   ___, ___,  ___,  ___,
    ___,
 
-   ___,                    ___, Key_Keypad7, Key_Keypad8,   Key_Keypad9,        Key_KeypadSubtract, ___,
-   ___,                    ___, Key_Keypad4, Key_Keypad5,   Key_Keypad6,        Key_KeypadAdd,      ___,
-                           ___, Key_Keypad1, Key_Keypad2,   Key_Keypad3,        Key_Equals,         ___,
-   ___,                    ___, Key_Keypad0, Key_KeypadDot, Key_KeypadMultiply, Key_KeypadDivide,   Key_Enter,
-   ___, ___, ___, ___,
+   M(9), M(5), M(6), M(7), ___, ___, ___,
+   ___,  ___,  ___,  ___,  ___, ___, ___,
+         ___,  ___,  ___,  ___, ___, ___,
+   ___,  ___,  ___,  ___,  ___, ___, ___,
+   ___,  ___,  ___,  ___,
    ___),
 
   [FUNCTION] =  KEYMAP_STACKED
@@ -72,6 +65,102 @@ KEYMAPS(
    ___, Key_RightAlt, ___, ___,
    ___)
 	) // KEYMAPS(
+
+enum { VCONSOLE_1, VCONSOLE_2, VCONSOLE_3, VCONSOLE_4, VCONSOLE_5, VCONSOLE_6, VCONSOLE_7, VCONSOLE_8, XWIN_EXIT_APP, XMONAD_EXIT };
+
+// later in the Sketch:
+const macro_t *macroAction(uint8_t macroIndex, uint8_t keyState) {
+  switch (macroIndex) {
+  case VCONSOLE_1:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F1),
+                     U(LeftAlt),
+                     U(LeftControl));
+  case VCONSOLE_2:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F2),
+                     U(LeftAlt),
+                     U(LeftControl));
+    break;
+  case VCONSOLE_3:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F3),
+                     U(LeftAlt),
+                     U(LeftControl));
+    break;
+  case VCONSOLE_4:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F4),
+                     U(LeftAlt),
+                     U(LeftControl));
+    break;
+  case VCONSOLE_5:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F5),
+                     U(LeftAlt),
+                     U(LeftControl));
+    break;
+  case VCONSOLE_6:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F6),
+                     U(LeftAlt),
+                     U(LeftControl));
+    break;
+  case VCONSOLE_7:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F7),
+                     U(LeftAlt),
+                     U(LeftControl));
+    break;
+  case VCONSOLE_8:
+    return MACRODOWN(I(25),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     T(F8),
+                     U(LeftAlt),
+                     U(LeftControl));
+    break;
+  case XWIN_EXIT_APP:
+    return MACRODOWN(I(25),
+                     D(LeftGui),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     D(LeftShift),
+                     T(Equals),
+                     U(LeftGui),
+                     U(LeftControl),
+                     U(LeftAlt),
+                     U(LeftShift));
+    break;
+  case XMONAD_EXIT:
+    return MACRODOWN(I(25),
+                     D(LeftGui),
+                     D(LeftControl),
+                     D(LeftAlt),
+                     D(LeftShift),
+                     T(Minus),
+                     U(LeftGui),
+                     U(LeftControl),
+                     U(LeftAlt),
+                     U(LeftShift));
+    break;
+  }
+  return MACRO_NONE;
+}
 
 void toggleLedsOnSuspendResume(kaleidoscope::HostPowerManagement::Event event) {
   switch (event) {
@@ -99,7 +188,8 @@ KALEIDOSCOPE_INIT_PLUGINS(
   EscapeOneShot,
   LEDControl,
   ActiveModColorEffect,
-  OneShot
+  OneShot,
+  Macros
 );
 
 void setup() {
