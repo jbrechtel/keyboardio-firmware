@@ -14,7 +14,6 @@
 #include "Kaleidoscope-USB-Quirks.h"
 #include "Kaleidoscope-OneShot.h"
 #include "Kaleidoscope-Escape-OneShot.h"
-#include "Kaleidoscope-LED-ActiveModColor.h"
 
 enum { PRIMARY, MACROS, FUNCTION };
 #define PRIMARY_KEYMAP_CUSTOM
@@ -23,9 +22,9 @@ KEYMAPS(
   [PRIMARY] = KEYMAP_STACKED
   (___,               Key_1,         Key_2,         Key_3, Key_4, Key_5, OSL(MACROS),
    Key_Backtick,      Key_Q,         Key_W,         Key_E, Key_R, Key_T, Key_Tab,
-   OSM(LeftControl),  Key_A,         Key_S,         Key_D, Key_F, Key_G,
+   Key_LeftControl,  Key_A,         Key_S,         Key_D, Key_F, Key_G,
    Key_Escape, Key_Z, Key_X,         Key_C,         Key_V, Key_B,        ___,
-   Key_Home,   Key_Backspace, OSM(LeftGui), OSM(LeftShift),
+   Key_Home,   Key_Backspace, Key_LeftGui, Key_LeftShift,
    OSL(FUNCTION),
 
    ___,               Key_6,        Key_7,        Key_8,     Key_9,         Key_0,         ___,
@@ -187,7 +186,6 @@ KALEIDOSCOPE_INIT_PLUGINS(
   USBQuirks,
   EscapeOneShot,
   LEDControl,
-  ActiveModColorEffect,
   OneShot,
   Macros
 );
@@ -198,8 +196,6 @@ void setup() {
 
   OneShot.disableStickabilityForLayers();
   OneShot.disableStickabilityForModifiers();
-  ActiveModColorEffect.highlight_color = CRGB(0x00, 0xff, 0xff);
-  //ActiveModColorEffect.sticky_color = CRGB(0xff, 0x00, 0x00);
   LEDOff.activate();
 }
 
